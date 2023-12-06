@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Candidate Report</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../img/logo-icon-white.png">
+        
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+        
+        <link rel="stylesheet" href="../css/style.css">
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    
+        <script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore-compat.js"></script>
+    
+        <style>
+        body {
+            padding: 20px;
+        }
+        .section-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            transition: width 1s;
+        }
+        @media print {
+            .progress-bar {
+                /* Add your desired styles for progress bars when printing */
+                color: #fff !important;
+                text-align: center !important;
+                background-color: #007bff !important; /* Example color for 'bg-primary' class */
+            }
+        }
+
+        /* Styles for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        </style>
+    </head>
+    <body>
+        <!-- Company Logo -->
+        <div class="d-flex justify-content-between align-items-center">
+            <button class="btn btn-success-2 text-light mt-0" id="back-button">Back</button>
+            <a class="d-flex justify-content-center align-items-center" href="../index.html">
+                <img class="m-1" src="../img/logo-text.png" alt="Company Logo" style="height: 30%; width: 30%;">
+            </a>
+            <button type="button" class="btn btn-success-2 text-light mt-0" id="download-pdf" onclick="downloadPDF()"><i class="far fa-file-pdf"></i> Download</button>
+        </div>
+        <!-- Heading -->
+        <div class="row text-center d-flex justify-content-center align-item-center">
+            <h4 class="mt-5 text-success-2"><strong>CONSOLIDATED ANALYSIS</strong></h4>
+            <p class="mt-0">The report contains the analysis based on the facial expressions and language analysis of the candidate.</p>
+            <p class="mt-0"><span class="text-danger"><strong>Disclaimer: </strong></span>This is an automated report. This analysis presented by this report may not be accurate to 100%.</p>
+        </div>
+        
+        <!-- Candidate Information Section -->
+        <div class="section-container">
+            <h2 class="text-success-2 "><strong>Candidate Information</strong></h2>
+            <p><strong id = "name">Name</strong></p>
+            <p><strong id ="email">Email </strong></p>
+            <p><strong id ="contact">Contact:</strong></p>
+        </div>
+
+        <!-- Interview Details Section -->
+        <div class="section-container">
+            <h2 class="text-success-2 "><strong>Interview Information</strong></h2>
+            <p><strong id = "jobTitle">Job Applied for:</strong></p>
+            <p><strong id="time">Interview Time:</strong></p>
+            <p><strong id="interviewerName">Job Posted By:</strong></p>
+            <p><strong id="timeTaken">Total Time Taken for Interview:</strong></p>
+            <p><strong id="timePerQuestion">Average time per question:</strong></p>
+        </div>
+
+        <!-- Automated Report Section -->
+        <div class="section-container">
+            <h2 class="text-success-2 "><strong>Candidate Performance Analysis</strong></h2>
+            <h4><strong>Emotional Analysis:</strong></h4>
+            <!-- <h6 class="text-dark">Happy</h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-success" style="width: 50%;" id="happy-progress">50%</div>
+            </div>
+            
+            <h6 class="text-dark">Sad</h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-danger" style="width: 20%;" id="sad-progress">20%</div>
+            </div> -->
+            
+            <h6 class="text-dark">Nervous</h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-warning" style="width: 10%;" id="nervous-progress">10%</div>
+            </div>
+            
+            <h6 class="text-dark">Smile</h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-info" style="width: 40%;" id="smile-progress">40%</div>
+            </div>
+
+            <h6 class="text-dark">Angry</h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-danger"  style="width: 25%;" id="angry-progress">25%</div>
+            </div>
+            
+            <h6 class="text-dark">Fear</h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-secondary" style="width: 15%;" id="fear-progress">15%</div>
+            </div>
+            
+            <h6 class="text-dark">Disgust</h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-dark" style="width: 5%;" id="disgust-progress">5%</div>
+            </div>
+
+            
+
+
+            <!-- <h5><strong>Language Analysis:</strong></h5>
+        
+            <h6 class="text-dark">Positive Sentiment: <span id="positive-sentiment">20%</span> </h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-primary" style="width: 20%;" id="positive-sentiment-progress">20%</div>
+            </div>
+            <h6 class="text-dark">Negative Sentiment: <span id="negative-sentiment">50%</span> </h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-danger" style="width: 50%;" id="negative-sentiment-progress">50%</div>
+            </div>
+            <h6 class="text-dark">Neutral Sentiment: <span id="neutral-sentiment">30%</span> </h6>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-warning" style="width: 30%;" id="neutral-sentiment-progress">30%</div>
+            </div> -->
+
+
+
+
+
+            <!-- <p><strong>Summary:</strong></p>
+            <p>Candidate overall summary will be displayed here.</p> -->
+            <br>
+
+            <h4><strong>Answers Analysis:</strong></h4>
+            <div id="answer_analysis"></div>
+             
+
+        </div>
+        <div class="row bg-dark text-center d-flex justify-content-center align-item-center p-2">
+            <p class="mt-0 text-light"><span class="text-danger"><strong>Disclaimer: </strong></span>This is an automated report. This analysis presented by this report may not be accurate to 100%.</p>
+        
+            <small class="copyright text-light">Automated Interviews, 2023</small>
+        </div>
+
+        <!-- Modal -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <!-- <div class="modal-header">
+                    <h5 class="modal-title">Modal Header</h5>
+                    <span class="close">&times;</span>
+                </div> -->
+                <span class="close">&times;</span>
+                <div id="modal-content"></div>
+            </div>
+        </div>
+
+
+        <script src="../js/download-report.js"></script>
+
+        <script>
+
+
+                // var interviewCode = '';
+                var correct_answers=[];
+
+
+                const urlParams = new URLSearchParams(window.location.search);
+
+                // Get the value of the "name" parameter
+                const name = urlParams.get("name");
+                const email = urlParams.get("email");
+                const contact = urlParams.get("contact");
+                const time = urlParams.get("time");
+                const interviewCode = urlParams.get("jobCode");
+
+                function formatTime(totalSeconds) {
+                    var minutes = Math.floor(totalSeconds / 60);
+                    var seconds = (totalSeconds % 60).toFixed(0);
+
+                    // Format seconds with leading zero if necessary
+                    var formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    return minutes + "m:" + formattedSeconds+"s";
+                }
+
+
+                async function getAnswersArray() {
+                    try {
+                        const querySnapshot = await db.collection('interview-schedule')
+                        .where('interviewCode', '==', interviewCode)
+                        .get();
+
+                        if (querySnapshot.empty) {
+                        console.log('No matching documents.');
+                        return [];
+                        }
+
+                        // Assuming interviewCode is unique, there should be only one document
+                        const interviewDoc = querySnapshot.docs[0];
+                        const answersArray = interviewDoc.data().answers;
+
+                        //print(answersArray)
+
+                        return answersArray;
+
+                    } catch (error) {
+                        console.error('Error fetching answers:', error);
+                        throw error;
+                    }
+                }
+
+                getAnswersArray().then(resultArray => {
+                    console.log(resultArray);
+                    correct_answers = resultArray
+                        // Now you can work with the resultArray
+                        // console.log(resultArray[0]); // Access the first element
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+                    console.log(correct_answers)
+
+                
+
+
+                // Display the values on the page
+                document.getElementById("name").textContent = "Name: "+ name;
+                document.getElementById("email").textContent = "Email: "+email;
+                document.getElementById("contact").textContent = "Contact: "+contact;
+                document.getElementById("time").textContent = "Interview Time: "+time;
+            
+
+                var interviewScheduleRef = db.collection("interview-schedule");
+                var candidateRef = db.collection("candidates");
+
+
+                // Query for interview details based on interview code
+                interviewScheduleRef.where("interviewCode", "==", interviewCode)
+                .get()
+                .then(function(querySnapshot) {
+                    querySnapshot.forEach(function(doc) {
+                    // doc.data() is the data of the document
+                    var interviewDetails = doc.data();
+                    const jobTitle =  interviewDetails.jobTitle;
+                    const interviewerName =  interviewDetails.interviewerName;
+                    // const startTime =  interviewDetails.startTime;
+                    
+                    console.log("Interview Details:", interviewDetails);
+
+                    document.getElementById("jobTitle").textContent = "Job Applied For: "+jobTitle;
+                    document.getElementById("interviewerName").textContent = "Job Posted by: "+interviewerName;
+                    
+                    });
+                })
+                .catch(function(error) {
+                    console.log("Error getting interview details:", error);
+                });
+
+
+                // fetch emotiona and answers data
+
+                // Create a query to find the document with the specified interviewCode
+                var query = candidateRef.where("CandidateEmail", "==", email);
+                // Fetch the matching documents
+                query.get().then((querySnapshot) => {
+                    if (!querySnapshot.empty) {
+                        querySnapshot.forEach((doc) => {
+                            var data = doc.data();
+
+                            var total_time_taken = formatTime(data.total_time_taken)
+                            var time_per_question = formatTime(data.time_per_question)
+                            
+                            const totalTime = document.getElementById('timeTaken')
+                            totalTime.innerText= "Total Time Taken for Interview: "+total_time_taken
+
+                            const perQuestionTime = document.getElementById('timePerQuestion')
+                            perQuestionTime.innerText = "Per Question Time: " + time_per_question
+
+                            var emotion = data.emotion;
+                            // emotion = JSON.parse(emotions);
+                            const anger =  emotion.Angry;
+                            const disgust =  emotion.Disgust;
+                            const fear =  emotion.Fear;
+                            const nervous =  emotion.Nervous;
+                            const smile = emotion.Smile;
+                            const positive = emotion.Positive;
+                            const negative = emotion.Negative;
+                            const neutral = emotion.Neutral;
+                            
+                            console.log("Emotion Details:", emotion);
+
+                            const disgust_progress = document.getElementById('disgust-progress');
+                            disgust_progress.style.width = disgust.toFixed(0) + '%'; // Update the width of the progress bar
+                            disgust_progress.innerHTML = disgust.toFixed(0) + '%';
+
+                            const smile_progress = document.getElementById('smile-progress');
+                            smile_progress.style.width = smile.toFixed(0) + '%'; // Update the width of the progress bar
+                            smile_progress.innerHTML = smile.toFixed(0) + '%';
+
+                            const nervous_progress = document.getElementById('nervous-progress');
+                            nervous_progress.style.width = nervous.toFixed(0) + '%'; // Update the width of the progress bar
+                            nervous_progress.innerHTML = nervous.toFixed(0) + '%';
+
+                            const fear_progress = document.getElementById('fear-progress');
+                            fear_progress.style.width = fear.toFixed(0) + '%'; // Update the width of the progress bar
+                            fear_progress.innerHTML = fear.toFixed(0) + '%';
+
+                            const anger_progress = document.getElementById('angry-progress');
+                            anger_progress.style.width = anger.toFixed(0) + '%'; // Update the width of the progress bar
+                            anger_progress.innerHTML = anger.toFixed(0) + '%';
+
+                            // const positive_heading = document.getElementById('positive-sentiment');
+                            // positive_heading.innerHTML = positive.toFixed(0) + '%';
+                            
+                            // const positive_progress = document.getElementById('positive-sentiment-progress');
+                            // positive_progress.style.width = positive.toFixed(0) + '%'; // Update the width of the progress bar
+                            // positive_progress.innerHTML = positive.toFixed(0) + '%';
+                            
+                            // const negative_heading = document.getElementById('negative-sentiment');
+                            // negative_heading.innerHTML = negative.toFixed(0) + '%';
+                            
+                            // const negative_progress = document.getElementById('negative-sentiment-progress');
+                            // negative_progress.style.width = negative.toFixed(0) + '%'; // Update the width of the progress bar
+                            // negative_progress.innerHTML = negative .toFixed(0)+ '%';
+
+                            // const nervous_heading = document.getElementById('neutral-sentiment');
+                            // nervous_heading.innerHTML = neutral.toFixed(0) + '%';
+                            
+                            // const neutral_progress = document.getElementById('neutral-sentiment-progress');
+                            // neutral_progress.style.width = neutral.toFixed(0) + '%'; // Update the width of the progress bar
+                            // neutral_progress.innerHTML = neutral.toFixed(0) + '%';         
+                            
+
+                            // Now you can access the properties in 'data' object
+                            var answersResult = data.answers_result;
+                            console.log("answersResult", answersResult)
+                            console.log("actual Answers", correct_answers)
+
+                            
+
+                            for (var i = 0; i < answersResult.length; i++) {
+                                
+                                var answer = answersResult[i];
+                                var correctAnswer = correct_answers[i];
+                                var transcribedAnswer = answer.TranscribedAnswer;
+                                var answerCorrectness = parseFloat(answer.AnswerCorrectness);
+
+                                
+                                var answerAnalysisDiv = document.getElementById("answer_analysis");
+                                
+                                // Create a new <h6> element for transcribed answer
+                                var answerCorrectnessHeader = document.createElement("h6");
+                                answerCorrectnessHeader.classList.add("text-dark");
+                                answerCorrectnessHeader.textContent = "Answer "+(i+1)+" Correctness: ";
+
+                                // // Create a new <span> element for transcribed answer value
+                                // var transcribedAnswerSpan = document.createElement("span");
+                                // transcribedAnswerSpan.id = "ans-transc";
+                                // transcribedAnswerSpan.textContent = transcribedAnswer;
+
+                                // Append the <span> to the <h6> element
+                                // transcribedAnswerHeader.appendChild(transcribedAnswerSpan);
+
+
+
+                                // Create a new <div> element for progress bar
+                                var progressBarDiv = document.createElement("div");
+                                progressBarDiv.classList.add("progress", "mb-3");
+
+                                // Create a new <div> element for the progress bar
+                                var progressBar = document.createElement("div");
+                                progressBar.classList.add("progress-bar", "bg-primary");
+                                progressBar.style.width = answerCorrectness + "%";
+                                progressBar.textContent = answerCorrectness.toFixed(2) + "%"; // Display percentage as text
+
+                                // Append the progress bar to the progress bar div
+                                progressBarDiv.appendChild(progressBar);
+
+                            // Create a new button for viewing correct answer
+                            var viewCorrectAnswer = document.createElement("button");
+                            viewCorrectAnswer.classList.add("btn", "btn-secondary", "btn-sm", "ml-2"); // Use btn-sm class
+                            viewCorrectAnswer.style.marginBottom = '30px';
+                            viewCorrectAnswer.style.marginRight = '70px';
+                            viewCorrectAnswer.textContent = "View Actual Answer";
+
+                            // Add event listener to open the modal with correct answer when the button is clicked
+                            viewCorrectAnswer.addEventListener("click", createViewAnswerFunction(correctAnswer));
+
+                            // Create a new button for viewing candidate's answer
+                            var viewCandidateAnswer = document.createElement("button");
+                            viewCandidateAnswer.classList.add("btn", "btn-secondary", "btn-sm", "ml-2"); // Use btn-sm class
+                            viewCandidateAnswer.style.marginBottom = '30px';
+                            viewCandidateAnswer.textContent = "View Attempted Answer";
+
+                            // Add event listener to open the modal with candidate's answer when the button is clicked
+                            viewCandidateAnswer.addEventListener("click", createViewAnswerFunction(transcribedAnswer));
+
+
+                        // Function to create the event listener function
+                        function createViewAnswerFunction(answer) {
+                            return function() {
+                                var modal = document.getElementById("myModal");
+                                var modalContent = document.getElementById("modal-content");
+
+                                modalContent.innerHTML = answer;
+
+                                // Display the modal
+                                modal.style.display = "block";
+
+                                // When the user clicks on the close button, close the modal
+                                var closeButton = document.getElementsByClassName("close")[0];
+                                closeButton.onclick = function() {
+                                    modal.style.display = "none";
+                                };
+
+                                // When the user clicks outside the modal, close it
+                                window.onclick = function(event) {
+                                    if (event.target == modal) {
+                                        modal.style.display = "none";
+                                    }
+                                };
+                            };
+                        }
+
+
+
+                                // Append both the new <h6> and progress bar div to the answer analysis div
+                                answerAnalysisDiv.appendChild(answerCorrectnessHeader);
+                                answerAnalysisDiv.appendChild(progressBarDiv);
+                                // Add the buttons to the desired container
+                                answerAnalysisDiv.appendChild(viewCorrectAnswer);
+                                answerAnalysisDiv.appendChild(viewCandidateAnswer);
+                            }
+
+                        });
+                    } else {
+                        console.log("No matching documents found");
+                    }
+                }).catch((error) => {
+                    console.error("Error getting documents:", error);
+                });
+
+        
+
+        </script>
+    </body>
+</html>
