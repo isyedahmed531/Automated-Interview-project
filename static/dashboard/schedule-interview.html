@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <title>Schedule Interview</title>
+    
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="description" content="Automated Interviews">
+    <meta name="author" content="Syed Ahmed">    
+    <link rel="App icon" href="../img/logo-icon-white.png"> 
+    
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+	
+	<!-- App CSS -->  
+    <link id="theme-style" rel="stylesheet" href="css/portal.css">
+	
+	<!--Firebase Authentication-->
+	<script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-auth-compat.js"></script>
+
+</head> 
+
+<body class="app">   	 
+    <header class="app-header fixed-top">	
+		<!--Topbar Start-->   	            
+        <div class="app-header-inner">  
+	        <div class="container-fluid py-2">
+		        <div class="app-header-content"> 
+		            <div class="row justify-content-between align-items-center">
+						<div class="col-auto">
+							<a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
+								<i class="fas fa-bars text-success"></i></a>	
+						</div>
+						<h1 class="app-page-title text-success text-center">Schedule Interview</h1>
+		        	</div>
+	            </div>
+	        </div>
+        </div> 
+		<!--Topbar End-->
+
+		<!--Sidebar start-->
+        <div id="app-sidepanel" class="app-sidepanel"> 
+	        <div id="sidepanel-drop" class="sidepanel-drop"></div>
+	        <div class="sidepanel-inner d-flex flex-column ">
+		        <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
+		        <div class="app-branding">
+		            <a class="app-logo" href="index.html">
+						<img class="logo-icon" 
+						src="../img/logo-text.png" 
+						alt="logo"
+						style="width: 90%; height: 80%;">
+					</a>
+				</div> 
+			    <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
+				    <ul class="app-menu list-unstyled accordion" id="menu-accordion">
+						<li class="nav-item">
+					    	<a class="nav-link" href="dashboard.html">
+								<span class="nav-icon"> <i class="fas fa-home"></i> </span>
+								<span class="ml-2 nav-link-text">Home</span>
+					        </a>
+					    </li>
+					    <li class="nav-item">
+					    	<a class="nav-link" href="profile.html">
+								<span class="nav-icon"> <i class="fas fa-qrcode"></i> </span>
+								<span class="ml-2 nav-link-text">Company Profile</span>
+					        </a>
+					    </li>
+						<li class="nav-item">
+					    	<a class="nav-link active" href="schedule-interview.html">
+								<span class="nav-icon"> <i class="fas fa-calendar-alt"></i> </span>
+								<span class="ml-2 nav-link-text">Schedule Interview</span>
+					        </a>
+					    </li>
+						<li class="nav-item">
+					    	<a class="nav-link" href="candidate-list.html">
+								<span class="nav-icon"> <i class="fas fa-list-ul"></i> </span>
+								<span class="ml-2 nav-link-text">Candidate List</span>
+					        </a>
+					    </li>
+						<hr class="solid">	    
+				    </ul>
+			    </nav>
+				<!--sidebar top end-->
+
+				<!--sidebar footer start-->
+			    <div class="app-sidepanel-footer">
+				    <nav class="app-nav app-nav-footer">
+					    <ul class="app-menu footer-menu list-unstyled">
+						    <li class="nav-item">
+						        <a class="nav-link" href="../index.html">
+									<span class="nav-icon"> <i class="fas fa-cogs"></i> </span>
+							        <span class="nav-link-text">Homepage</span>
+						        </a>
+						    </li>
+							<li class="nav-item">
+								<a class="nav-link">
+									<span class="nav-icon"> <i class="fas fa-sign-out-alt"></i> </span>
+							        <span class="nav-link-text" type="button" id="logout-button">Logout</span>
+						        </a>
+						    </li>
+					    </ul>
+				    </nav>
+			    </div>
+				<!--sidebar footer end-->
+	        </div>
+	    </div>
+		<!--sidebar end-->
+    </header>
+
+	<div class="app-wrapper">
+		<div class="app-content pt-3 ">
+			<!--Basic Interview Details Start-->
+			<form class="form-card" onsubmit="event.preventDefault()" id="form">
+				<div class="row d-flex justify-content-between m-5">
+					<div class="col-4 text-center justify-content-between my-auto">
+						<div class="item-label text-success"><strong>Job Start Date</strong><span class="text-danger"> *</span></div>
+						<input type="date" class="form-control text-center" id="interview-start-date" required>
+						<strong><p class="text-danger" id="validation-start-date"></p></strong>
+
+						<div class="item-label text-success"><strong>Job Deadline</strong><span class="text-danger"> *</span></div>
+						<input type="date" class="form-control text-center" id="interview-end-date" required>
+						<strong><p class="text-danger" id="validation-end-date"></p></strong>
+
+						<div class="item-label text-success"><strong>Duration of Interview</strong><span class="text-danger"> *</span></div>
+						<div class="d-flex justify-content-between g-4">
+						<input type="number" class="form-control text-center" id="interview-hours" min=0 max=59 required placeholder="Hour">
+						<input type="number" class="form-control text-center" id="interview-minutes" min=0 max=59 required placeholder="Minutes">
+						<input type="number" class="form-control text-center mb-3" id="interview-seconds" min=0 max=59 required placeholder="Seconds">
+						</div>
+
+						<div class="item-label text-success"><strong>Per Question Time</strong><span class="text-danger"> *</span></div>
+						<div class="d-flex justify-content-between g-4">
+						<input type="number" class="form-control text-center" id="question-hours" min=0 max=59 required placeholder="Hour">
+						<input type="number" class="form-control text-center" id="question-minutes" min=0 max=59 required placeholder="Minutes">
+						<input type="number" class="form-control text-center mb-3" id="question-seconds" min=0 max=59 required placeholder="Seconds">
+						</div>
+						
+					</div>
+					<div class="col-6 text-center justify-content-between my-auto">
+						<div class="item-label text-success"><strong>Job Title</strong><span class="text-danger"> *</span></div>
+						<input type="text" placeholder="Enter Job Title" class="form-control text-center mb-3" id="job-title" required>
+
+						<div class="item-label text-success mt-1"><strong>Job Description</strong></div>
+						<textarea class="form-control p-5 mb-3" id="job-description" rows="3" cols="50"></textarea>
+
+						
+						<div class="item-label text-success"><strong>Interviewer Name</strong><span class="text-danger"> *</span></div>
+						<input type="text" placeholder="Enter Interviewer Name" class="form-control text-center mb-3" id="interviewer-name" required>
+						
+						<div class="item-label text-success"><strong>Interviewer Contact</strong><span class="text-danger"> *</span></div>
+						<input type="number" placeholder="Enter Interviewer Contact" class="form-control text-center mb-3" id="interviewer-contact" required>
+					</div>
+				</div>	
+				<div class="text-center pt-3 p-md-2 p-lg-4">
+					<button type="button" class="btn btn-secondary border" id="add-question-button">Add Questions</button>
+					
+				</div>
+			</form>
+			<div class="d-flex justify-content-center mb-2">
+				<button type="button" class="btn btn-secondary border mt-5" id="generate-interview-link-button" onclick="generateCode()">Click to Generate Interview Code</button>
+			</div>	
+			<div class="d-flex justify-content-center">
+				<p readonly class="text-center border form-control" id="interview-link" style="max-width: 300px"></p>
+				
+			</div>
+			<div class="text-center">
+				<h6 class="text-danger" id="check-values"><strong></strong></h6>
+				<button type="button" class="btn btn-secondary border" id="schedule-interview-button">Schedule Interview</button>
+			</div>
+		</div>
+	</div>
+	<!-- Modal for Interview Details -->
+	<div class="modal" tabindex="-1" id="interview-modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modal-title"></h5>
+				</div>
+				<div class="modal-body">
+					<h4 class="mb-3"><strong>INTERVIEW CODE:</strong><span id="modal-interview-code"></span></h4>
+					<p><strong>Start Date: </strong><span id="modal-start-date"></span></p>
+					<p><strong>End Date: </strong><span id="modal-end-date"></span></p>
+					<p><strong>Duration: </strong><span id="modal-duration"></span></p>
+					<p><strong>Question Duration: </strong><span id="modal-question-duration"></span></p>
+					<p><strong>Job Title: </strong><span id="modal-job-title"></span></p>
+					<p><strong>Job Description: </strong><span id="modal-job-description"></span></p>
+					<p><strong>Interviewer Name: </strong><span id="modal-interviewer-name"></span></p>
+					<p><strong>Interviewer Contact: </strong><span id="modal-interviewer-contact"></span></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!--Basic Interview Details End-->	
+
+	    <footer class="app-footer">
+		    <div class="container text-center pt-3 p-md-2 p-lg-4">
+		        <small class="copyright text-success">Automated Interviews, 2023</small>
+		    </div>
+	    </footer>
+    </div> 
+
+    <!-- Javascript -->          
+    <script src="plugins/popper.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.min.js"></script>  
+    
+    <!-- Page Specific JS -->
+    <script src="js/app.js"></script> 
+	<script src="../js/firebase-interview.js"></script>
+	<!--<script src="../js/firebase-logout.js"></script> -->
+
+</body>
+</html> 
+
